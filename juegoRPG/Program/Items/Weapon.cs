@@ -1,4 +1,4 @@
-namespace juegoRPG.Program;
+namespace juegoRPG.Program.Items;
 
 public abstract class Weapon: IItem
 {
@@ -6,4 +6,5 @@ public abstract class Weapon: IItem
     public abstract int Damage { get; }
     
     public abstract void Apply(Character character);
+    public abstract void Unapply(Character character);
 }

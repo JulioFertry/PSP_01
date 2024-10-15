@@ -1,4 +1,4 @@
-namespace juegoRPG.Program;
+namespace juegoRPG.Program.Items;
 
 public class Helmet: Protection
 {
@@ -8,8 +8,15 @@ public class Helmet: Protection
 
     public override void Apply(Character owner)
     {
+        owner.BaseArmor += Armor;
         owner.MaxHitPoints += ExtraHp;
         owner.HitPoints += ExtraHp;
         Console.WriteLine($"¡{owner.Name} se ha equipado {Name}!");
+    }
+    
+    public override void Unapply(Character owner)
+    {
+        owner.BaseArmor -= Armor;
+        Console.WriteLine($"¡{owner.Name} se ha desequipado {Name}!");
     }
 }

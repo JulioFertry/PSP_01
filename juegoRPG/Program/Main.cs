@@ -1,4 +1,6 @@
 ﻿namespace juegoRPG.Program;
+using Minions;
+using Items;
 
 class MainClass
 {

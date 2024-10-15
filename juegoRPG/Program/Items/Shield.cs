@@ -1,4 +1,4 @@
-namespace juegoRPG.Program;
+namespace juegoRPG.Program.Items;
 
 public class Shield: Protection
 {
@@ -7,6 +7,13 @@ public class Shield: Protection
 
     public override void Apply(Character owner)
     {
+        owner.BaseArmor += Armor;
         Console.WriteLine($"¡{owner.Name} se ha equipado {Name}!");
+    }
+    
+    public override void Unapply(Character owner)
+    {
+        owner.BaseArmor -= Armor;
+        Console.WriteLine($"¡{owner.Name} se ha desequipado {Name}!");
     }
 }

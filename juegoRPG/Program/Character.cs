@@ -1,4 +1,7 @@
 namespace juegoRPG.Program;
+using Minions;
+using Items;
+using Perks;
 
 public class Character
 {
@@ -9,6 +12,8 @@ public class Character
     public int BaseDamage {get; set;}
     public int BaseArmor {get; set;}
     private List<IItem> Inventory {get; set;}
+    private List<IMinion> Summons {get; set;}
+    private List<IPerk> Perks {get; set;}
     
     
     public Character(string name, int maxHitPoints, int baseDamage, int baseArmor)
@@ -20,16 +25,14 @@ public class Character
         BaseDamage = baseDamage;
         BaseArmor = baseArmor;
         Inventory = new List<IItem>();
+        Summons = new List<IMinion>();
+        Perks = new List<IPerk>();
     }
     
     
     public void Attack(Character target)
     {
         int damage = BaseDamage;
-        foreach (var weapon in Inventory.OfType<Weapon>())
-        {
-            damage += weapon.Damage;
-        }
         
         Console.WriteLine($"{Name} ataca a {target.Name}");
         target.ReceiveDamage(damage);
@@ -68,10 +71,6 @@ public class Character
     public void ReceiveDamage(int amount)
     {
         int armor = BaseArmor;
-        foreach (var protection in Inventory.OfType<Protection>())
-        {
-            armor += protection.Armor;
-        }
         
         int realDamage = amount - armor;
         if (realDamage <= 0)
@@ -94,6 +93,13 @@ public class Character
     
     
     public void EquipItem(IItem item)
+    {
+        Inventory.Add(item);
+        item.Apply(this);
+    }
+    
+    
+    public void UnequipItem(IItem item)
     {
         Inventory.Add(item);
         item.Apply(this);
