@@ -1,5 +1,5 @@
 ﻿namespace juegoRPG.Program;
-using Minions;
+using Players;
 using Items;
 
 class MainClass
@@ -12,12 +12,12 @@ class MainClass
             
             if (j1.Alive)
             {
-                j1.Attack(j2);
+                j1.Attack();
             }
 
             if (j2.Alive)
             {
-                j2.Attack(j1);
+                j2.Attack();
             }
         }
 
@@ -36,7 +36,7 @@ class MainClass
     static void Main()
     {
         // Crea un jugador
-        Character jugador1 = new Character("Pepe", 50, 5, 2);
+        Character jugador1 = new Character("Pepe", 50, 100, 10, 10, 50);
         
         // Crea 2 objetos
         Weapon espada = new Sword();
@@ -48,7 +48,7 @@ class MainClass
         
         
         // Crea otro jugador
-        Character jugador2 = new Character("Juan", 50, 5, 2);
+        Character jugador2 = new Character("Juan", 35, 50, 20, 5, 65);
         
         // Crea 2 objetos
         Weapon hacha = new Axe();
@@ -66,5 +66,8 @@ class MainClass
         
         string winner = Fight(jugador1, jugador2);
         Console.WriteLine($"El ganador es {winner}");
+        
     }
+
+    
 }

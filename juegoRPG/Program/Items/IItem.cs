@@ -1,4 +1,5 @@
 namespace juegoRPG.Program.Items;
+using Players;
 
 public interface IItem
 {

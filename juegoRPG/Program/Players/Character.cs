@@ -1,76 +1,74 @@
-namespace juegoRPG.Program;
+namespace juegoRPG.Program.Players;
 using Minions;
 using Items;
-using Perks;
 
 public class Character
 {
     public string Name {get; private set;}
-    public int MaxHitPoints {get; set;}
-    public int HitPoints {get; set;}
+    public Stats Stats {get; private set;}
+    public int Health {get; private set;}
+    public int Mana {get; private set;}
+    public int Coins {get; private set;}
     public bool Alive {get; set;}
-    public int BaseDamage {get; set;}
-    public int BaseArmor {get; set;}
     private List<IItem> Inventory {get; set;}
     private List<IMinion> Summons {get; set;}
-    private List<IPerk> Perks {get; set;}
     
     
-    public Character(string name, int maxHitPoints, int baseDamage, int baseArmor)
+    public Character(string name, int health, int mana, int damage, int armor, int speed)
     {
         Name = name;
-        MaxHitPoints = maxHitPoints;
-        HitPoints = maxHitPoints;
+        Stats = new Stats(health, mana, damage, armor, speed);
+        Health = health;
+        Mana = mana;
+        Coins = 0;
         Alive = true;
-        BaseDamage = baseDamage;
-        BaseArmor = baseArmor;
         Inventory = new List<IItem>();
         Summons = new List<IMinion>();
-        Perks = new List<IPerk>();
+    }
+
+    public void Die()
+    {
+        Alive = false;
     }
     
     
-    public void Attack(Character target)
+    public int Attack()
     {
-        int damage = BaseDamage;
+        int damage = Stats.BaseDamage;
+
+        return damage;
+    }
+    
+    
+    public int Defend(int damage)
+    {
+        int actualDamage = damage - Stats.BaseArmor;
+
+        if (actualDamage < 0)
+        {
+            actualDamage = 1;
+        }
         
-        Console.WriteLine($"{Name} ataca a {target.Name}");
-        target.ReceiveDamage(damage);
-    }
-    
-    
-    public void Defend()
-    {
-        BaseArmor += 2;
-        BaseDamage += 1;
-        Console.WriteLine($"{Name} se defiende, su adefensa sube 2 puntos y su ataque sube 1 punto");
-    }
-    
-    
-    public void Sharpen()
-    {
-        BaseDamage += 3;
-        BaseArmor -= 1;
-        Console.WriteLine($"{Name} afila su arma ganando 3 puntos de ataque y perdiendo 1 punto de defensa");
+        return actualDamage;
     }
     
     
     public void Heal(int amount)
     {
-        HitPoints += amount;
-        if (HitPoints > MaxHitPoints)
+        Health += amount;
+        if (Health > Stats.MaxHealth)
         {
-            HitPoints = MaxHitPoints;
+            Health = Stats.MaxHealth;
         }
         
-        Console.WriteLine($"{Name} se ha curado, ahora tiene {HitPoints} puntos de vida");
+        Console.WriteLine($"{Name} se ha curado, ahora tiene {Health} puntos de vida");
         
     }
     
     
     public void ReceiveDamage(int amount)
     {
-        int armor = BaseArmor;
+        int armor = Stats.BaseArmor;
         
         int realDamage = amount - armor;
         if (realDamage <= 0)
@@ -78,16 +76,16 @@ public class Character
             realDamage = 1;
         }
         
-        HitPoints -= realDamage;
+        Health -= realDamage;
         
-        if (HitPoints <= 0)
+        if (Health <= 0)
         {
             Alive = false;
             Console.WriteLine($"¡{Name} sufre {realDamage} puntos de daño y muere!");
         }
         else
         {
-            Console.WriteLine($"{Name} sufre {realDamage} puntos de daño, le quedan {HitPoints}");
+            Console.WriteLine($"{Name} sufre {realDamage} puntos de daño, le quedan {Health}");
         }
     }
     
@@ -119,7 +117,7 @@ public class Character
     public void ShowGeneralInfo()
     {
         Console.WriteLine($"Nombre: {Name}");
-        Console.WriteLine($"HP: {MaxHitPoints}");
+        Console.WriteLine($"HP: {Stats.MaxHealth}");
         ShowInventory();
         Console.WriteLine("");
     }
