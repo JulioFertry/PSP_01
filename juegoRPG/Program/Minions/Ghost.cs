@@ -5,7 +5,7 @@ using Perks;
 public class Ghost: Minion
 {
     public override string Name => "Fantasmico";
-    public override int Damage => 2;
+    public override int Damage => 1;
     public Perk MinionAbility { get; private set; }
 
     

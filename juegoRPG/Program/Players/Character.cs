@@ -67,7 +67,7 @@ public class Character
     {
         Protection? protection = Equipment.Protection;
         
-        int defense = Stats.BaseDamage;
+        int defense = Stats.BaseArmor;
         
         if (protection is not null)
         {

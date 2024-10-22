@@ -7,13 +7,13 @@ class MainClass
 {
     static void Main()
     {
-        Character player1 = new Character("Juana de Arco", 100, 10, 15, 3);
-        Character player2 = new Character("William Wallace", 100, 5, 10, 5);
+        Character player1 = new Character("Juana de Arco", 100, 15, 8, 3);
+        Character player2 = new Character("William Wallace", 100, 10, 4, 8);
         
         Battle battle = new Battle(player1, player2);
 
         Weapon weapon1 = new Sword();
-        Weapon weapon2 = new Sword();
+        Weapon weapon2 = new MagicStaff();
     
         Protection protection1 = new Helmet(); 
         Protection protection2 = new Shield();

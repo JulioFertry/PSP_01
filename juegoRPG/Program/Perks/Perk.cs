@@ -1,5 +1,3 @@
-using juegoRPG.Program.Players;
-
 namespace juegoRPG.Program.Perks;
 
 
