@@ -1,17 +1,23 @@
 namespace juegoRPG.Program.Minions;
+using Perks;
 
-public class Ghost: Summon
+
+public class Ghost: Minion
 {
-    public override string Name => "Fantasma";
-    public override int BaseDamage => 4;
+    public override string Name => "Fantasmico";
+    public override int Damage => 2;
+    public Perk MinionAbility { get; private set; }
 
-    public override void Attack()
+    
+    public Ghost()
     {
-        throw new NotImplementedException();
+        MinionAbility = new FlameEffect();
     }
-
-    public override void Die()
+    
+    
+    public override int Attack()
     {
-        throw new NotImplementedException();
+        return Damage + MinionAbility.ApplyEffect();
     }
+    
 }

@@ -7,100 +7,166 @@ public class Character
     public string Name {get; private set;}
     public Stats Stats {get; private set;}
     public int Health {get; private set;}
-    public int Mana {get; private set;}
-    public int Coins {get; private set;}
-    public bool Alive {get; set;}
     private List<IItem> Inventory {get; set;}
-    private List<IMinion> Summons {get; set;}
+    private Equipment Equipment {get; set;}
+    public List<Minion> Summons {get; set;}
     
     
-    public Character(string name, int health, int mana, int damage, int armor, int speed)
+    public Character(string name, int health, int damage, int armor, int magic)
     {
         Name = name;
-        Stats = new Stats(health, mana, damage, armor, speed);
+        Stats = new Stats(health, damage, armor, magic);
         Health = health;
-        Mana = mana;
-        Coins = 0;
-        Alive = true;
         Inventory = new List<IItem>();
-        Summons = new List<IMinion>();
+        Equipment = new Equipment();
+        Summons = new List<Minion>();
     }
+    
+    
+    public event Action<String>? OnDamaged;
+    public event Action<String>? OnDeath;
+    public event Action<String>? OnHeal;
+    public event Action<String>? OnEquip;
+    public event Action<String>? OnUnequip;
 
-    public void Die()
+    
+    public bool IsAlive()
     {
-        Alive = false;
+        if (Health <= 0)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
     
     
     public int Attack()
     {
+        Weapon? weapon = Equipment.Weapon;
+        
         int damage = Stats.BaseDamage;
+
+        foreach (Minion minion in Summons)
+        {
+            damage += minion.Attack();
+        }
+        
+        if (weapon is not null)
+        {
+            damage += weapon.Apply();
+        }
 
         return damage;
     }
     
     
-    public int Defend(int damage)
+    private int Defend()
     {
-        int actualDamage = damage - Stats.BaseArmor;
-
-        if (actualDamage < 0)
+        Protection? protection = Equipment.Protection;
+        
+        int defense = Stats.BaseDamage;
+        
+        if (protection is not null)
         {
-            actualDamage = 1;
+            defense += protection.Apply();
         }
         
-        return actualDamage;
+        return defense;
     }
     
     
-    public void Heal(int amount)
+    public void Heal()
     {
-        Health += amount;
-        if (Health > Stats.MaxHealth)
+        if (IsAlive())
         {
-            Health = Stats.MaxHealth;
-        }
+            Health += Stats.Magic;
+            if (Health > Stats.MaxHealth)
+            {
+                Health = Stats.MaxHealth;
+            }
         
-        Console.WriteLine($"{Name} se ha curado, ahora tiene {Health} puntos de vida");
+            OnHeal?.Invoke($"{Name} se ha curado, vida actual: {Health}");
+        }
         
     }
     
     
     public void ReceiveDamage(int amount)
     {
-        int armor = Stats.BaseArmor;
-        
-        int realDamage = amount - armor;
-        if (realDamage <= 0)
+        int defense = Defend();
+        int actualDamage = amount - defense;
+
+        if (actualDamage <= 0)
         {
-            realDamage = 1;
+            actualDamage = 1;
         }
         
-        Health -= realDamage;
+        Health -= actualDamage;
         
-        if (Health <= 0)
+        OnDamaged?.Invoke($"{Name} ha sufrido {actualDamage} de daño");
+
+        if (!IsAlive())
         {
-            Alive = false;
-            Console.WriteLine($"¡{Name} sufre {realDamage} puntos de daño y muere!");
+            OnDeath?.Invoke($"{Name} ha muerto!");
         }
-        else
+        
+    }
+    
+    
+    public void TakeItem(IItem item)
+    {
+        Inventory.Add(item);
+        if (item is Protection)
         {
-            Console.WriteLine($"{Name} sufre {realDamage} puntos de daño, le quedan {Health}");
+            Protection? itemProt = item as Protection;
+            itemProt.SetOwner(this);
         }
+        else if (item is Weapon)
+        {
+            Weapon? itemWeap = item as Weapon;
+            itemWeap.SetOwner(this);
+        }
+
     }
     
     
     public void EquipItem(IItem item)
     {
-        Inventory.Add(item);
-        item.Apply(this);
+        if (Inventory.Contains(item))
+        {
+            
+            if (item is Protection)
+            {
+                Protection? itemProt = item as Protection;
+                Equipment.EquipProt(itemProt);
+            }
+            else
+            {
+                Weapon? itemWeap = item as Weapon;
+                Equipment.EquipWeap(itemWeap);
+            }
+        
+            OnEquip?.Invoke($"{Name} ha equipado {item.GetType().Name}");
+        }
+        
     }
     
     
     public void UnequipItem(IItem item)
     {
-        Inventory.Add(item);
-        item.Apply(this);
+        if (item is Protection)
+        {
+            Equipment.DeleteProt();
+        }
+        else
+        {
+            Equipment.DeleteWeap();
+        }
+        
+        OnUnequip?.Invoke($"{Name} ha desequipado {item.GetType().Name}");
     }
     
     
@@ -112,6 +178,16 @@ public class Character
             Console.WriteLine($"{item.GetType().Name}");
         }
     }
+
+    
+    public void ShowSummons()
+    {
+        Console.WriteLine("Minions:");
+        foreach (var minion in Summons)
+        {
+            Console.WriteLine($"{minion.GetType().Name}");
+        }
+    }
     
     
     public void ShowGeneralInfo()
@@ -119,6 +195,8 @@ public class Character
         Console.WriteLine($"Nombre: {Name}");
         Console.WriteLine($"HP: {Stats.MaxHealth}");
         ShowInventory();
+        ShowSummons();
         Console.WriteLine("");
     }
+
 }
